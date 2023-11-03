@@ -14,14 +14,14 @@ class UR5Control:
         self.tolerance = 0.01
         self.gripper_ctrl_LIMIT = self.robot_config.model.actuator("fingers_actuator").ctrlrange[1]
 
+
     def move_ee1(self,detal):
         feedback = self.interface.get_feedback()
         Tx = self.robot_config.Tx("EE", q=feedback["q"], object_type="body")
         target_xyz = np.array([Tx[0]+detal[0], Tx[1]+detal[1], Tx[2]+detal[2]])
-        # R = self.robot_config.R("EE", q=feedback["q"])
-        # target_orientation = transformations.euler_from_matrix(R, "sxyz")
-        target_orientation = (-3.142388974297311, 0.0007961799642564419, 1.529146285751125e-05)
-
+        R = self.robot_config.R("EE", q=feedback["q"])
+        target_orientation = transformations.euler_from_matrix(R, "sxyz")
+        # print(target_orientation)
         # update the position of the target
         # self.interface.set_mocap_xyz("target", target_xyz)
         # can use 3 different methods to calculate inverse kinematics
@@ -29,8 +29,8 @@ class UR5Control:
         self.path_planner.generate_path(
             position=feedback["q"],
             target_position=np.hstack([target_xyz, target_orientation]),
-            method=1,
-            dt=0.002,
+            method=2,
+            dt=0.001,
             n_timesteps=self.n_timesteps,
             plot=False, )
 
@@ -44,9 +44,8 @@ class UR5Control:
     def move_ee2(self, pos):
         feedback = self.interface.get_feedback()
         target_xyz = np.array([pos[0], pos[1], pos[2]])
-        # R = self.robot_config.R("EE", q=feedback["q"])
-        # target_orientation = transformations.euler_from_matrix(R, "sxyz")
-        target_orientation = (-3.142388974297311, 0.0007961799642564419, 1.529146285751125e-05)
+        R = self.robot_config.R("EE", q=feedback["q"])
+        target_orientation = transformations.euler_from_matrix(R, "sxyz")
         # update the position of the target
         # self.interface.set_mocap_xyz("target", target_xyz)
         # can use 3 different methods to calculate inverse kinematics
@@ -54,8 +53,8 @@ class UR5Control:
         self.path_planner.generate_path(
             position=feedback["q"],
             target_position=np.hstack([target_xyz, target_orientation]),
-            method=1,
-            dt=0.002,
+            method=2,
+            dt=0.001,
             n_timesteps=self.n_timesteps,
             plot=False, )
 
@@ -74,7 +73,7 @@ class UR5Control:
             self.interface.viewer.render()
             error = abs(self.interface.get_feedback()['q'].copy() - new_q)
             # print(max(abs(error)))
-            if max(error) < 0.015:
+            if max(error) < 0.011:
                 break
 
     def close_gripper(self, current_target_joint_values):
