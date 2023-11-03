@@ -43,7 +43,7 @@ class Mujoco(Interface):
         robot_config,
         dt=0.001,
         display_frequency=1,
-        render_params=None
+        render_params=None,
     ):
         super().__init__(robot_config)
 

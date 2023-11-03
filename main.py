@@ -13,6 +13,7 @@ import mujoco
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import multiprocessing
 
 
 # initialize our robot config for the jaco2
@@ -20,6 +21,12 @@ robot_config = arm("ur5e.xml", folder='./ur5', use_sim_state=False)
 
 # create our path planner
 n_timesteps = 2000
+
+
+
+maximum_range = 0.001  # 传感器最大量程，根据实际情况进行调整
+plt.figure()
+sensor_data = np.zeros((4, 4))
 
 # create our interface
 dt = 0.002
@@ -30,30 +37,53 @@ flag = True
 target = None
 ur5_control = UR5Control(interface, robot_config, n_timesteps)
 
-maximum_range = 20  # 传感器最大量程，根据实际情况进行调整
+# 初始化计数器和采样周期
+counter = 0
+sampling_period = 10  # 采样周期，例如每10个回调周期采样一次
 
+# 初始化传感器数据
+sensor_data = np.zeros((4, 4))
 
+# 创建一个Matplotlib图形对象
+img = plt.imshow(sensor_data, cmap='viridis', interpolation='nearest')
+# # 添加颜色条
+plt.colorbar()
+# 设置图形标题
+plt.title('Sensor Data Visualization')
+
+# 更新传感器数据的回调函数
+# 更新传感器数据的回调函数
 def sensor_callback(model, data):
-    sensor_data = []  # 初始化传感器数据
-
-    # global sensor_data
+    global sensor_data
+    global sensor_queue
     for i in range(16):
         sensor_name = f'touch{i}'
         data_value = data.sensor(sensor_name).data[1].copy()
-        sensor_data.append(data_value)
-    sensor_data = np.array(sensor_data).reshape((4, 4))
-
+        sensor_data[i // 4, i % 4] = data_value
+    sensor_queue.put(sensor_data)  # 通过队列传递传感器数据
 
 # 设置传感器回调
-# mujoco.set_mjcb_control(sensor_callback)
+sensor_queue = multiprocessing.Queue()
+mujoco.set_mjcb_control(sensor_callback)
 
-# 创建动画
+# 定义一个函数用于绘制图形的进程
+def plot_data(sensor_queue):
+    while True:
+        sensor_data = sensor_queue.get()  # 从队列获取传感器数据
+        img.set_data(sensor_data)
+        img.autoscale()
+        plt.pause(0.01)
+
+plot_process = multiprocessing.Process(target=plot_data, args=(sensor_queue,))
+
 
 try:
     print("\nSimulation starting...")
     print("Click to move the target.\n")
 
-    count = 0
+    # 启动图形绘制进程
+    plot_process.start()
+
     while not glfw.window_should_close(interface.viewer.window):
 
         if flag:
@@ -79,5 +109,5 @@ try:
 finally:
     # stop and reset the simulation
     interface.disconnect()
-
+    plot_process.terminate()
     print("Simulation terminated...")
