@@ -16,7 +16,7 @@ from matplotlib.animation import FuncAnimation
 
 
 # initialize our robot config for the jaco2
-robot_config = arm("ur5e.xml", folder='/home/rw/桌面/soft_grasp/ur5', use_sim_state=False)
+robot_config = arm("ur5e.xml", folder='./ur5', use_sim_state=False)
 
 # create our path planner
 n_timesteps = 2000
