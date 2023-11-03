@@ -58,18 +58,18 @@ try:
 
         if flag:
             print(robot_config.model.joint("slide_joint").damping[0])
-            ur5_control.move_ee(detal=[0, 0.002, -0.177])
+            ur5_control.move_ee2(pos=[-0.135,0.495,0.16])
             ur5_control.close_gripper(0.7)   # upper:0.796
-            ur5_control.move_ee(detal=[0, 0, 0.177])
+            ur5_control.move_ee1(detal=[0, 0, 0.1])
 
             ur5_control.close_gripper(0.0)   # upper:0.796
-            ur5_control.move_ee(detal=[0, 0.004, -0.157])
+            ur5_control.move_ee2(pos=[-0.135,0.495,0.16])
             ur5_control.close_gripper(0.7)   # upper:0.796
 
             ur5_control.joint_control(detal_array=np.array([0, 0, 0, 0, 0, np.pi]))
             robot_config.model.joint("slide_joint").damping[0] = 1
             print(robot_config.model.joint("slide_joint").damping[0])
-            ur5_control.move_ee(detal=[0, 0, 0.177])
+            ur5_control.move_ee1(detal=[0, 0, 0.177])
             #
             flag = False
 

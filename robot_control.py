@@ -14,13 +14,39 @@ class UR5Control:
         self.tolerance = 0.01
         self.gripper_ctrl_LIMIT = self.robot_config.model.actuator("fingers_actuator").ctrlrange[1]
 
-    def move_ee(self,detal):
+    def move_ee1(self,detal):
         feedback = self.interface.get_feedback()
         Tx = self.robot_config.Tx("EE", q=feedback["q"], object_type="body")
         target_xyz = np.array([Tx[0]+detal[0], Tx[1]+detal[1], Tx[2]+detal[2]])
-        R = self.robot_config.R("EE", q=feedback["q"])
-        target_orientation = transformations.euler_from_matrix(R, "sxyz")
+        # R = self.robot_config.R("EE", q=feedback["q"])
+        # target_orientation = transformations.euler_from_matrix(R, "sxyz")
+        target_orientation = (-3.142388974297311, 0.0007961799642564419, 1.529146285751125e-05)
 
+        # update the position of the target
+        # self.interface.set_mocap_xyz("target", target_xyz)
+        # can use 3 different methods to calculate inverse kinematics
+        # see inverse_kinematics.py file for details
+        self.path_planner.generate_path(
+            position=feedback["q"],
+            target_position=np.hstack([target_xyz, target_orientation]),
+            method=1,
+            dt=0.002,
+            n_timesteps=self.n_timesteps,
+            plot=False, )
+
+        # returns desired [position, velocity]
+        while self.path_planner.n < self.path_planner.n_timesteps:
+            target = self.path_planner.next()[0]
+            # use position control
+            self.interface.set_target_ctrl(target[: self.robot_config.N_JOINTS])
+            self.interface.viewer.render()
+
+    def move_ee2(self, pos):
+        feedback = self.interface.get_feedback()
+        target_xyz = np.array([pos[0], pos[1], pos[2]])
+        # R = self.robot_config.R("EE", q=feedback["q"])
+        # target_orientation = transformations.euler_from_matrix(R, "sxyz")
+        target_orientation = (-3.142388974297311, 0.0007961799642564419, 1.529146285751125e-05)
         # update the position of the target
         # self.interface.set_mocap_xyz("target", target_xyz)
         # can use 3 different methods to calculate inverse kinematics

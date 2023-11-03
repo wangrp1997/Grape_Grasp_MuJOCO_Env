@@ -109,7 +109,7 @@ class InverseKinematics:
             pinv_Jx = np.linalg.pinv(Jx)
 
             # dr = np.zeros(3)
-            dr[dr < 1e-2] = 0
+            dr[dr < 0.01] = 0
 
             # Different ways to compute inverse resolved motion
             if method == 1:
