@@ -47,7 +47,7 @@ class UR5Control:
             self.interface.set_target_ctrl(new_q)
             self.interface.viewer.render()
             error = abs(self.interface.get_feedback()['q'].copy() - new_q)
-            print(max(abs(error)))
+            # print(max(abs(error)))
             if max(error) < 0.015:
                 break
 

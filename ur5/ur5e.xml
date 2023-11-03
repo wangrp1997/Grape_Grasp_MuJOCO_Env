@@ -425,11 +425,12 @@
             <!-- 铰链关节 -->
             <joint name="hinge_joint" type="hinge" axis="0 0 1" pos="0 0 0.034" damping="0.1"/>
             <!-- 滑动关节 -->
-            <joint name="slide_joint" type="slide" axis="0 0 1" pos="0 0 0"/>
+            <joint name="slide_joint" type="slide" axis="0 0 1" pos="0 0 0" damping="100"/>
+<!--            可设置参数：1.stiffness 2.frictionloss-->
             <composite type="ellipsoid" count="4 4 4" spacing="0.01"
             solrefsmooth="0.004 1" solimpsmooth="0.8 0.9 0.1 0.5 6">
 <!--                  <skin rgba="0.5 0 0.5 1"/>-->
-                <geom type="sphere" size="0.005" rgba="0.8 0.2 0.9 1" mass="0.1"
+                <geom type="sphere" size="0.005" rgba="0.8 0.2 0.9 1" mass="0.01"
                       friction="0.01 0.01 0.01" solref="0.004 1" solimp="0.95 0.99 0.001"
                 condim="4"/>
             </composite>
@@ -478,7 +479,7 @@
     <general class="size1" name="wrist_1" joint="wrist_1_joint"/>
     <general class="size1" name="wrist_2" joint="wrist_2_joint"/>
     <general class="size1" name="wrist_3" joint="wrist_3_joint"/>
-    <general class="2f85" name="fingers_actuator" tendon="split" forcerange="-5 5" ctrlrange="0 255"
+    <general class="2f85" name="fingers_actuator" tendon="split" forcerange="-1 1" ctrlrange="0 255"
       gainprm="0.3137255 0 0" biasprm="0 -100 -10" ctrllimited="true"/>
   </actuator>
 
