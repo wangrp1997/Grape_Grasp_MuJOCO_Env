@@ -42,7 +42,6 @@ def sensor_callback(model, data):
         data_value = data.sensor(sensor_name).data[1].copy()
         sensor_data.append(data_value)
     sensor_data = np.array(sensor_data).reshape((4, 4))
-    # print(sensor_data)
 
 
 # 设置传感器回调
