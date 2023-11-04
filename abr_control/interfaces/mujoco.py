@@ -44,6 +44,7 @@ class Mujoco(Interface):
         dt=0.001,
         display_frequency=1,
         render_params=None,
+        im=None,
     ):
         super().__init__(robot_config)
 
@@ -53,8 +54,9 @@ class Mujoco(Interface):
         self.render_params = render_params
         self.count = 0  # keep track of how many times send forces is called
         self.timestep = 0
-
         self.camera_feedback = np.array([])
+        self.im = im
+
         if self.render_params:
             # if not empty, create array for storing rendered camera feedback
             self.camera_feedback = np.zeros(
@@ -126,7 +128,7 @@ class Mujoco(Interface):
 
         # create the visualizer
         if self.display_frequency > 0:
-            self.viewer = mujoco_viewer.MujocoViewer(self.model, self.data)
+            self.viewer = mujoco_viewer.MujocoViewer(self.model, self.data, self.im)
             # set the default display to skip frames to speed things up
             self.viewer._render_every_frame = False
 

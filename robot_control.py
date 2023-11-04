@@ -73,7 +73,7 @@ class UR5Control:
             self.interface.viewer.render()
             error = abs(self.interface.get_feedback()['q'].copy() - new_q)
             # print(max(abs(error)))
-            if max(error) < 0.011:
+            if max(error) < 0.012:
                 break
 
     def close_gripper(self, current_target_joint_values):
