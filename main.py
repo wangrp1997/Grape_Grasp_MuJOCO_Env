@@ -33,7 +33,7 @@ vmin, vmax = 0, 4
 
 # 创建初始的colorbar
 im = sensor_subplot.imshow(sensor_data, cmap='viridis', vmin=vmin, vmax=vmax, extent=[0, 4, 0, 4])  # 设置x轴和y轴范围
-sensor_subplot.set_title('Sensor Data')
+# sensor_subplot.set_title('Sensor Data')
 
 cbar = plt.colorbar(im, ax=sensor_subplot)
 cbar.set_label('Sensor Value')  # 颜色条标题
@@ -61,18 +61,31 @@ try:
 
         if flag:
             # print(robot_config.model.joint("slide_joint").damping[0])
-            ur5_control.move_ee2(pos=[-0.135,0.495,0.16])
+            ur5_control.move_ee2(pos=[-0.135, 0.495, 0.16])
             ur5_control.close_gripper(0.7)   # upper:0.796
             ur5_control.move_ee2(pos=[-0.135, 0.495, 0.26])
+            print(f'Current grasp Z position: {robot_config.data.body("grape_0").xpos[2]}')
 
-            ur5_control.close_gripper(0.0)   # upper:0.796
-            ur5_control.move_ee2(pos=[-0.135,0.495,0.16])
-            ur5_control.close_gripper(0.7)   # upper:0.796
+            while robot_config.data.body("grape_0").xpos[2] < 0.24:
+                ur5_control.close_gripper(0.0)   # upper:0.796
+                ur5_control.move_ee2(pos=[-0.135, 0.495, 0.16])
+                ur5_control.close_gripper(0.7)   # upper:0.796
 
-            ur5_control.joint_control(detal_array=np.array([0, 0, 0, 0, 0, np.pi]))
-            robot_config.model.joint("slide_joint").damping[0] = 1
-            # print(robot_config.model.joint("slide_joint").damping[0])
-            ur5_control.move_ee2(pos=[-0.135, 0.495, 0.26])
+                print(f"Current hinge joint position: {robot_config.data.joint('hinge_joint').qpos}")
+                hinge_joint0 = robot_config.data.joint('hinge_joint').qpos[0]
+
+                ur5_control.joint_control(detal_array=np.array([0, 0, 0, 0, 0, np.pi]))
+                print(f"Current hinge joint position: {robot_config.data.joint('hinge_joint').qpos}")
+                hinge_joint1 = robot_config.data.joint('hinge_joint').qpos[0]
+
+                if abs(hinge_joint1 - hinge_joint0) < 0.6:
+                    robot_config.model.actuator("fingers_actuator").forcerange[1] += 4
+
+                robot_config.model.joint("slide_joint").damping[0] -= abs(hinge_joint1 - hinge_joint0)*50
+                # print(robot_config.model.joint("slide_joint").damping[0])
+                ur5_control.move_ee2(pos=[-0.135, 0.495, 0.26])
+                print(f'Current grasp Z positon: {robot_config.data.body("grape_0").xpos[2]}')
+
             #
             flag = False
 

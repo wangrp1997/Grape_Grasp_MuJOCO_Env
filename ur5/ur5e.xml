@@ -423,7 +423,7 @@
 
           <body name="grape_0" pos="0 0 0.034">
             <!-- 铰链关节 -->
-            <joint name="hinge_joint" type="hinge" axis="0 0 1" pos="0 0 0.034" damping="0.1"/>
+            <joint name="hinge_joint" type="hinge" axis="0 0 1" pos="0 0 0.034" damping="0.5"/>
             <!-- 滑动关节 -->
             <joint name="slide_joint" type="slide" axis="0 0 1" pos="0 0 0" damping="100"/>
 <!--            可设置参数：1.stiffness 2.frictionloss-->

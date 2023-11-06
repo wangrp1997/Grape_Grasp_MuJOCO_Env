@@ -68,12 +68,13 @@ class UR5Control:
     def joint_control(self, detal_array):
         current_q = self.interface.get_feedback()['q'].copy()
         new_q = current_q + detal_array
+        t0 = time.time()
         while 1:
             self.interface.set_target_ctrl(new_q)
             self.interface.viewer.render()
             error = abs(self.interface.get_feedback()['q'].copy() - new_q)
             # print(max(abs(error)))
-            if max(error) < 0.012:
+            if max(error) < 0.012 or time.time()-t0 > 10:
                 break
 
     def close_gripper(self, current_target_joint_values):
